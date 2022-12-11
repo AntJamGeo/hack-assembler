@@ -3,7 +3,7 @@ class Parser():
         self.line_no = 0
     
     def parse(self, line):
-        if len(line) < 2: # ignore whitespace
+        if len(line) < 1: # ignore whitespace
             return ""
         elif line[0] == "@": # A-Instruction
             self.line_no += 1
@@ -19,13 +19,16 @@ class Parser():
             raise InstructionError(f"Invalid Instruction: {line}")
 
     def _a_inst(self, line):
-        return line
+        for i in range(1, len(line)):
+            if line[i] == " ":
+                break
+        return ("A", line[1:i+1])
 
     def _l_inst(self, line):
         return ""
 
     def _c_inst(self, line):
-        return line
+        return ("C", "", "", "")
 
 class InstructionError(Exception):
     pass
