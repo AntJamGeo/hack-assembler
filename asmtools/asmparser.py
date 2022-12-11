@@ -58,7 +58,7 @@ class Parser():
             comp = compjump[:semi_colon_index]
             jump = compjump[semi_colon_index+1:]
 
-        return ("C", dest, comp, jump) 
+        return ("C", dest, comp, jump, self.total_lines, line) 
 
 def _strip_comments(line):
     """Remove any comments from a line."""

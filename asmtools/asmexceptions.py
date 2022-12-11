@@ -6,7 +6,7 @@ class InstructionError(Exception):
         self.inst_type = inst_type
         self.extra_info = extra_info
         super().__init__(f"Bad {self.inst_type}instruction on " +
-                         f"line {self.line}: {self.inst}.{self.extra_info}")
+                         f"line {self.line}: '{self.inst}'.{self.extra_info}")
 
 # A-Instruction Errors
 class AInstructionError(InstructionError):
@@ -32,9 +32,9 @@ class DestinationError(CInstructionError):
         super().__init__(line, inst, "destination", dest) 
 
 class ComputationError(CInstructionError):
-    def __init__(self, inst, line, comp):
+    def __init__(self, line, inst, comp):
         super().__init__(line, inst, "computation", comp) 
 
 class JumpError(CInstructionError):
-    def __init__(self, inst, line, jump):
+    def __init__(self, line, inst, jump):
         super().__init__(line, inst, "jump", jump)

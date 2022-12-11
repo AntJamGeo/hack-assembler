@@ -1,8 +1,16 @@
+from .asmexceptions import DestinationError, ComputationError, JumpError 
+
 def code(inst):
     if inst[0] == "A":
         bits = bin(int(inst[1])).replace("0b", "")
         return "0" * (16 - len(bits)) + bits
     if inst[0] == "C":
+        if inst[1] not in _dest:
+            raise DestinationError(inst[4], inst[5], inst[1])
+        if inst[2] not in _comp:
+            raise ComputationError(inst[4], inst[5], inst[2])
+        if inst[3] not in _jump:
+            raise JumpError(inst[4], inst[5], inst[3])
         return "111" + _comp[inst[2]] + _dest[inst[1]] + _jump[inst[3]]
 
 _dest = {None: "000", "M": "001", "D": "010", "MD": "011", "A": "100",
