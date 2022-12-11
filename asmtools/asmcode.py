@@ -3,7 +3,7 @@ def code(inst):
         bits = bin(int(inst[1])).replace("0b", "")
         return "0" * (16 - len(bits)) + bits
     if inst[0] == "C":
-        return "111" + _dest[inst[1]] + _comp[inst[2]] + _jump[inst[3]]
+        return "111" + _comp[inst[2]] + _dest[inst[1]] + _jump[inst[3]]
 
 _dest = {None: "000", "M": "001", "D": "010", "MD": "011", "A": "100",
          "AM": "101", "AD": "110", "AMD": "111"}
