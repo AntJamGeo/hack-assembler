@@ -14,5 +14,5 @@ if __name__ == "__main__":
         for line in in_file:
             instruction = p.parse(line)
             if instruction:
-                bits = e.code(instruction)
+                bits = e.encode(instruction)
                 out_file.write(bits + "\n")

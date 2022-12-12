@@ -47,6 +47,7 @@ class Parser():
         InstructionError
             An invalid instruction has been passed and cannot be parsed
         """
+
         self.instruction = strip_line(instruction)
         self.line_no += 1
         if len(self.instruction) < 1: # ignore whitespace

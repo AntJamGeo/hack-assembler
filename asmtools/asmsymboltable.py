@@ -2,6 +2,26 @@ from .asmexceptions import NoAddressError, BadAddressError
 from .asmtools import strip_line
 
 class SymbolTable():
+    """
+    A store of all symbols in the .asm file.
+
+    Attributes
+    ----------
+    table : dict
+        Contains all symbols and their corresponding addresses
+    rom_no : int
+        Keeps track of which ROM number should be assigned to the next
+        variable
+    line_no : int
+        Keeps track of which line number should be assigned to the next label
+
+    Methods
+    -------
+    add_symbol(inst)
+        Looks for any symbols in the given instruction and updates the table
+        if necessary
+    """
+    
     def __init__(self):
         self.table = {"SP": 0, "LCL": 1, "ARG": 2, "THIS": 3, "THAT": 4,
                       "SCREEN": 16384, "KBD": 24576}
@@ -11,6 +31,15 @@ class SymbolTable():
         self.line_no = 0
 
     def add_symbol(self, instruction):
+        """
+        Looks for any symbols in the given instruction and updates the table
+        if necessary.
+
+        Parameters
+        ----------
+        inst : str
+            The instruction in which we want to find a symbol
+        """
         self.instruction = strip_line(instruction)
         if len(self.instruction) < 1:
             return

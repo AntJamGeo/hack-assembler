@@ -1,10 +1,50 @@
 from .asmexceptions import DestinationError, ComputationError, JumpError 
 
 class Encoder():
+    """
+    Uses information from an assembly language instruction that has been
+    parsed using a Parser instance to produce the corresponding machine
+    language instruction.
+
+    Attributes
+    ----------
+    table : SymbolTable
+        Contains all the symbols used in the .asm file with their
+        corresponding addresses
+
+    Methods
+    -------
+    encode(inst)
+        Converts parsed instruction into machine language
+    """
+    
     def __init__(self, table):
         self.table = table
 
-    def code(self, inst):
+    def encode(self, inst):
+        """
+        Converts parsed instruction into machine language.
+
+        Parameters
+        ----------
+        inst : tuple(str)
+            Parsed instruction to be encoded
+
+        Returns
+        -------
+        str
+            Instruction in machine language
+
+        Raises
+        ------
+        DestinationError
+            The destination provided in a C-Instruction is invalid
+        ComputationError
+            The computation provided in a C-Instruction is invalid
+        JumpError
+            The jump provided in a C-Instruction is invalid
+        """
+
         if inst[0] == "A":
             bits = bin(int(inst[1])).replace("0b", "")
             return "0" * (16 - len(bits)) + bits
