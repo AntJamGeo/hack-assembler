@@ -1,4 +1,4 @@
-from .asmexceptions import InstructionError
+from .asmexceptions import InstructionError, NoAddressError, BadAddressError
 from .asmtools import strip_line
 
 class Parser():
@@ -65,6 +65,10 @@ class Parser():
 
     def _a_inst(self):
         """Parse A-Instructions."""
+        if self.instruction == "@":
+            raise NoAddressError(self.total_lines, self.instruction)
+        if len(self.instruction.split()) > 1:
+            raise BadAddressError(self.total_lines, self.instruction, symbol) 
         return ("A", self.instruction[1:])
 
     def _l_inst(self):
