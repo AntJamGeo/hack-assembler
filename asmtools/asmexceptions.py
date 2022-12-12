@@ -35,9 +35,9 @@ class NoAddressError(AInstructionError):
     def __init__(self, line, inst):
         super().__init__(line, inst, "No address given.")
 
-class BadAddressError(AInstructionError):
-    def __init__(self, line, inst, invalid_address):
-        super().__init__(line, inst, f"Invalid address: '{invalid_address}'.")
+class BadVariableError(AInstructionError):
+    def __init__(self, line, inst, invalid_variable):
+        super().__init__(line, inst, f"Invalid symbol: '{invalid_variable}'.")
 
 # C-Instruction Errors
 class CInstructionError(InstructionError):
