@@ -8,6 +8,23 @@ class InstructionError(Exception):
         super().__init__(f"Bad {self.inst_type}instruction on " +
                          f"line {self.line}: '{self.inst}'.{self.extra_info}")
 
+# L-Instruction Errors
+class LInstructionError(InstructionError):
+    def __init__(self, line, inst, extra_info):
+        super().__init__(line, inst, "l-", extra_info)
+
+class BracketError(LInstructionError):
+    def __init__(self, line, inst):
+        super().__init__(line, inst, "Brackets must wrap the whole line.")
+
+class DuplicateLabelError(LInstructionError):
+    def __init__(self, line, inst, label):
+        super().__init__(line, inst, f"Label '{label}' already in use.")
+
+class BadLabelError(LInstructionError):
+    def __init__(self, line, inst, label):
+        super().__init__(line, inst, f"Invalid label: '{label}'.")
+
 # A-Instruction Errors
 class AInstructionError(InstructionError):
     def __init__(self, line, inst, extra_info):
