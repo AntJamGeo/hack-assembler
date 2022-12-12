@@ -7,7 +7,7 @@ if __name__ == "__main__":
     s = asmtools.SymbolTable()
     with open(file_name, 'r') as in_file:
         for line in in_file:
-            s.add_symbol(line)
+            s.add_label(line)
     p = asmtools.Parser()
     e = asmtools.Encoder(s)
     with open(file_name, 'r') as in_file, open(new_file_name, 'w') as out_file:
