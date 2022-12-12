@@ -1,11 +1,8 @@
 from .asmexceptions import DestinationError, ComputationError, JumpError 
 
 class Encoder():
-    def __init__(self):
-        self.table = {"SP": 0, "LCL": 1, "ARG": 2, "THIS": 3, "THAT": 4,
-                      "SCREEN": 16384, "KBD": 24576}
-        for i in range(16):
-            self.table["R"+str(i)] = str(i)
+    def __init__(self, table):
+        self.table = table
 
     def code(self, inst):
         if inst[0] == "A":

@@ -1,10 +1,10 @@
 # Generic Instruction Error
 class InstructionError(Exception):
-    def __init__(self, line, inst, inst_type="", extra_info=""):
+    def __init__(self, line, inst, inst_type="", extra_info=None):
         self.line = line
         self.inst = inst
         self.inst_type = inst_type
-        self.extra_info = extra_info
+        self.extra_info = " " + extra_info if extra_info else ""
         super().__init__(f"Bad {self.inst_type}instruction on " +
                          f"line {self.line}: '{self.inst}'.{self.extra_info}")
 
@@ -15,17 +15,17 @@ class AInstructionError(InstructionError):
 
 class NoAddressError(AInstructionError):
     def __init__(self, line, inst):
-        super().__init__(line, inst, " No address given.")
+        super().__init__(line, inst, "No address given.")
 
 class BadAddressError(AInstructionError):
     def __init__(self, line, inst, invalid_address):
-        super().__init__(line, inst, f" Invalid address: '{invalid_address}'.")
+        super().__init__(line, inst, f"Invalid address: '{invalid_address}'.")
 
 # C-Instruction Errors
 class CInstructionError(InstructionError):
     def __init__(self, line, inst, c_type, invalid_field):
         super().__init__(line, inst, "c-",
-                         f" Invalid {c_type}: '{invalid_field}'.")
+                         f"Invalid {c_type}: '{invalid_field}'.")
 
 class DestinationError(CInstructionError):
     def __init__(self, line, inst, dest):
