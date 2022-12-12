@@ -15,11 +15,12 @@ class LInstructionError(InstructionError):
 
 class BracketError(LInstructionError):
     def __init__(self, line, inst):
-        super().__init__(line, inst, "Brackets must wrap the whole line.")
+        super().__init__(line, inst, "Brackets must wrap the whole line" +
+                                     " (excluding comments).")
 
 class DuplicateLabelError(LInstructionError):
     def __init__(self, line, inst, label):
-        super().__init__(line, inst, f"Label '{label}' already in use.")
+        super().__init__(line, inst, f"Label '{label}' used multiple times.")
 
 class BadLabelError(LInstructionError):
     def __init__(self, line, inst, label):
