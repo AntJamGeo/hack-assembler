@@ -1,7 +1,8 @@
-"""This module provides access to required classes for translating assembly
+"""
+This module provides access to required classes for translating assembly
 language to machine language.
 """
 
-from .asmparser import Parser
-from .asmcode import Encoder
-from .asmsymboltable import SymbolTable
+from .parser import Parser
+from .code import Encoder
+from .symboltable import SymbolTable

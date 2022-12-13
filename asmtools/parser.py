@@ -1,6 +1,6 @@
-from .asminstruction import AInstruction, CInstruction
-from .asmtools import strip_line
-from .asmexceptions import InstructionError
+from .instruction import AInstruction, CInstruction
+from .funcs import strip_line
+from .exceptions import InstructionError
 
 class Parser():
     """

@@ -1,5 +1,5 @@
-from .asminstruction import AInstruction, CInstruction
-from .asmexceptions import (RAMError, DestinationError, ComputationError,
+from .instruction import AInstruction, CInstruction
+from .exceptions import (RAMError, DestinationError, ComputationError,
         JumpError)
 
 class Encoder():

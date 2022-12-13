@@ -1,5 +1,5 @@
 import string
-from .asmexceptions import (NoAddressError, BadVariableError,
+from .exceptions import (NoAddressError, BadVariableError,
         AddressOutOfBoundsError)
 
 class Instruction():

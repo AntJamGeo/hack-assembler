@@ -1,5 +1,5 @@
-from .asmexceptions import BracketError, DuplicateLabelError, BadLabelError
-from .asmtools import strip_line
+from .exceptions import BracketError, DuplicateLabelError, BadLabelError
+from .funcs import strip_line
 
 class SymbolTable():
     """
