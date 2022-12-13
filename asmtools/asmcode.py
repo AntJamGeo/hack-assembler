@@ -1,4 +1,6 @@
-from .asmexceptions import DestinationError, ComputationError, JumpError 
+from .asminstruction import AInstruction, CInstruction
+from .asmexceptions import (RAMError, DestinationError, ComputationError,
+        JumpError)
 
 class Encoder():
     """
@@ -20,6 +22,7 @@ class Encoder():
     
     def __init__(self, table):
         self.table = table
+        self.ram_address = 16
 
     def encode(self, inst):
         """
@@ -27,7 +30,7 @@ class Encoder():
 
         Parameters
         ----------
-        inst : tuple(str)
+        inst : Instruction
             Parsed instruction to be encoded
 
         Returns
@@ -45,17 +48,38 @@ class Encoder():
             The jump provided in a C-Instruction is invalid
         """
 
-        if inst[0] == "A":
-            bits = bin(int(inst[1])).replace("0b", "")
-            return "0" * (16 - len(bits)) + bits
-        if inst[0] == "C":
-            if inst[1] not in _dest:
-                raise DestinationError(inst[4], inst[5], inst[1])
-            if inst[2] not in _comp:
-                raise ComputationError(inst[4], inst[5], inst[2])
-            if inst[3] not in _jump:
-                raise JumpError(inst[4], inst[5], inst[3])
-            return "111" + _comp[inst[2]] + _dest[inst[1]] + _jump[inst[3]]
+        self.inst = inst
+        if isinstance(self.inst, AInstruction):
+            return self._a_encode()
+        if isinstance(self.inst, CInstruction):
+            return self._c_encode()
+
+    def _a_encode(self):
+        value = self.inst.get_value()
+        if self.inst.is_numeric():
+            address = int(value)
+        elif self.table.contains(value):
+            address = self.table.get_address(value)
+        else:
+            if self.ram_address == 16383:
+                raise RAMError(self.inst)
+            address = self.ram_address
+            self.table.add_entry(value, address)
+            self.ram_address += 1
+        bits = bin(address).replace("0b", "")
+        return "0" * (16 - len(bits)) + bits
+
+    def _c_encode(self):
+        dest = self.inst.get_dest()
+        comp = self.inst.get_comp()
+        jump = self.inst.get_jump()
+        if dest not in _dest:
+            raise DestinationError(self.inst)
+        if comp not in _comp:
+            raise ComputationError(self.inst)
+        if jump not in _jump:
+            raise JumpError(self.inst)
+        return "111" + _comp[comp] + _dest[dest] + _jump[jump]
 
 _dest = {None: "000", "M": "001", "D": "010", "MD": "011", "A": "100",
          "AM": "101", "AD": "110", "AMD": "111"}

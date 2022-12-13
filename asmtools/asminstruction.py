@@ -1,3 +1,7 @@
+import string
+from .asmexceptions import (NoAddressError, BadVariableError,
+        AddressOutOfBoundsError)
+
 class Instruction():
     """
     An instruction class.
@@ -7,17 +11,26 @@ class Instruction():
     line : int
         The number in the file of the line from which the instruction
         was obtained
+    inst : str
+        The full instruction (excluding comments and surrounding
+        whitespace) as written in the provided file
 
     Methods
     -------
     get_line()
         Return the line attribute
+    get_inst()
+        Return the inst attribute
     """
-    def __init__(self, line):
+    def __init__(self, line, inst):
         self.line = line
+        self.inst = inst
 
     def get_line(self):
         return self.line
+
+    def get_inst(self):
+        return self.inst
 
 class AInstruction(Instruction):
     """
@@ -29,31 +42,54 @@ class AInstruction(Instruction):
     line : int
         The number in the file of the line from which the instruction
         was obtained
+    inst : str
+        The full instruction (excluding comments and surrounding
+        whitespace) as written in the provided file
     value : str
         The value after the '@' in the given A-Instruction
-    is_symbol : bool
-        True if the value attribute is symbolic, false if numeric
+    is_numeric : bool
+        True if the value attribute is numeric, false if symbolic
 
     Methods
     -------
     get_line()
         Return the line attribute
+    get_inst()
+        Return the inst attribute
     get_value()
         Return the value attribute
-    is_symbol()
+    is_numeric()
         Return the is_symbol attribute
     """
 
-    def __init__(self, value, line):
-        super().__init__(line)
+    def __init__(self, line, inst, value):
+        super().__init__(line, inst)
         self.value = value
-        self.is_symbol = not value.isdigit()
+        self.numeric = value.isdigit()
+        self._check_value()
 
     def get_value(self):
         return self.value
 
-    def is_symbol(self):
-        return self.is_symbol
+    def is_numeric(self):
+        return self.numeric
+
+    def _check_value(self):
+        """Check if an A-Instruction value is valid."""
+        if self.value == "":
+            raise NoAddressError(self)
+        if len(self.value.split()) > 1:
+            raise BadVariableError(self)
+        if self.numeric:
+            address = int(self.value)
+            if address < 0 or address > 32767:
+                raise AddressOutOfBoundsError(self)
+        elif self.value[0].isdigit():
+            raise BadVariableError(self)
+        else:
+            for c in self.value:
+                if c not in valid_chars:
+                    raise BadVariableError(self)
 
 class CInstruction(Instruction):
     """
@@ -65,6 +101,9 @@ class CInstruction(Instruction):
     line : int
         The number in the file of the line from which the instruction
         was obtained
+    inst : str
+        The full instruction (excluding comments and surrounding
+        whitespace) as written in the provided file
     dest : str
         Destination registers for the computation
     comp : str
@@ -76,6 +115,8 @@ class CInstruction(Instruction):
     -------
     get_line()
         Return the line attribute
+    get_inst()
+        Return the inst attribute
     get_dest()
         Return the dest attribute
     get_comp()
@@ -83,8 +124,8 @@ class CInstruction(Instruction):
     get_jump()
         Return the jump attribute
     """
-    def __init__(self, dest, comp, jump, line):
-        super().__init__(line)
+    def __init__(self, line, inst, dest, comp, jump):
+        super().__init__(line, inst)
         self.dest = dest
         self.comp = comp
         self.jump = jump
@@ -97,3 +138,5 @@ class CInstruction(Instruction):
 
     def get_jump(self):
         return self.jump
+
+valid_chars = frozenset(string.ascii_letters + string.digits + "_.$:")

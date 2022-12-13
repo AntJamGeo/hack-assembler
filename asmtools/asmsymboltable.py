@@ -54,3 +54,12 @@ class SymbolTable():
             self.table[label] = self.rom_address
         else:
             self.rom_address += 1
+
+    def add_entry(self, symbol, address):
+        self.table[symbol] = address
+
+    def contains(self, symbol):
+        return symbol in self.table
+
+    def get_address(self, symbol):
+        return self.table[symbol]

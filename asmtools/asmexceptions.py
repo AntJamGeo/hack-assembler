@@ -32,12 +32,18 @@ class AInstructionError(InstructionError):
         super().__init__(line, inst, "a-", extra_info)
 
 class NoAddressError(AInstructionError):
-    def __init__(self, line, inst):
-        super().__init__(line, inst, "No address given.")
+    def __init__(self, inst):
+        super().__init__(inst.get_line(), inst.get_inst(), "No address given.")
+
+class AddressOutOfBoundsError(AInstructionError):
+    def __init__(self, inst):
+        super().__init__(inst.get_line(), inst.get_inst(),
+                f"Address {inst.get_value()} not between 0-32767.")
 
 class BadVariableError(AInstructionError):
-    def __init__(self, line, inst, invalid_variable):
-        super().__init__(line, inst, f"Invalid symbol: '{invalid_variable}'.")
+    def __init__(self, inst):
+        super().__init__(inst.get_line(), inst.get_inst(),
+                f"Invalid variable: '{inst.get_value()}'.")
 
 # C-Instruction Errors
 class CInstructionError(InstructionError):
@@ -46,13 +52,22 @@ class CInstructionError(InstructionError):
                          f"Invalid {c_type}: '{invalid_field}'.")
 
 class DestinationError(CInstructionError):
-    def __init__(self, line, inst, dest):
-        super().__init__(line, inst, "destination", dest) 
+    def __init__(self, inst):
+        super().__init__(inst.get_line(),
+                inst.get_inst(), "destination", inst.get_dest())
 
 class ComputationError(CInstructionError):
-    def __init__(self, line, inst, comp):
-        super().__init__(line, inst, "computation", comp) 
+    def __init__(self, inst):
+        super().__init__(inst.get_line(),
+                inst.get_inst(), "computation", inst.get_comp())
 
 class JumpError(CInstructionError):
-    def __init__(self, line, inst, jump):
-        super().__init__(line, inst, "jump", jump)
+    def __init__(self, inst):
+        super().__init__(inst.get_line(),
+                inst.get_inst(), "jump", inst.get_jump())
+
+# Other Errors
+class RAMError(InstructionError):
+    def __init__(self, inst):
+        super().__init__(inst.get_line(), inst.get_inst(), "",
+                "RAM out of memory.")

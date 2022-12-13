@@ -1,5 +1,6 @@
-from .asmexceptions import InstructionError, NoAddressError, BadVariableError
+from .asminstruction import AInstruction, CInstruction
 from .asmtools import strip_line
+from .asmexceptions import InstructionError
 
 class Parser():
     """
@@ -9,8 +10,6 @@ class Parser():
 
     Attributes
     ----------
-    inst_no : int
-        count of valid instructions processed
     line : int
         count of lines processed
     inst : str
@@ -24,7 +23,6 @@ class Parser():
     """
 
     def __init__(self):
-        self.inst_no = 0
         self.line = 0
 
     def parse(self, inst):
@@ -39,7 +37,7 @@ class Parser():
 
         Returns
         -------
-        tuple
+        Instruction
             Useful information to be encoded by an Encoder instance
 
         Raises
@@ -53,23 +51,17 @@ class Parser():
         if len(self.inst) < 1: # ignore whitespace
             return False
         elif self.inst[0] == "@": # A-Instruction
-            self.inst_no += 1
             return self._a_inst()
         elif self.inst[0] == "(": # L-Instruction
             return False
         elif self.inst[0] in {"A", "D", "M", "0", "1", "-", "!"}: # C-Instruction
-            self.inst_no += 1
             return self._c_inst()
         raise InstructionError(self.line, self.inst)
 
 
     def _a_inst(self):
         """Parse A-Instructions."""
-        if self.inst == "@":
-            raise NoAddressError(self.line, self.inst)
-        if len(self.inst.split()) > 1:
-            raise BadVariableError(self.line, self.inst, symbol)
-        return ("A", self.inst[1:])
+        return AInstruction(self.line, self.inst, self.inst[1:])
 
     def _l_inst(self):
         """Parse L-Instructions."""
@@ -79,14 +71,12 @@ class Parser():
         """Parse C-Instructions."""
 
         # Find first '=' and split into dest and comp;jump parts
-        if self.inst[-1] == "=": # no final '=' simplifies later calculation
-            raise InstructionError(self.line, self.inst)
         equals_index = self.inst.find("=")
         if equals_index == -1:
             dest, compjump = None, self.inst
         else:
             dest = self.inst[:equals_index]
-            compjump = self.inst[equals_index+1:] # no final '=' so this is allowed
+            compjump = self.inst[equals_index+1:]
 
         # Find first ';' and split into comp and jump parts
         semi_colon_index = compjump.find(";")
@@ -96,5 +86,4 @@ class Parser():
             comp = compjump[:semi_colon_index]
             jump = compjump[semi_colon_index+1:]
 
-        return ("C", dest, comp, jump, self.line, self.inst)
-
+        return CInstruction(self.line, self.inst, dest, comp, jump)
