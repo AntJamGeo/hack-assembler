@@ -1,10 +1,13 @@
 import string
+from abc import ABC, abstractmethod
 from .exceptions import (NoAddressError, BadVariableError,
-        AddressOutOfBoundsError)
+        AddressOutOfBoundsError, DestinationError, ComputationError,
+        JumpError)
 
-class Instruction():
+class Instruction(ABC):
     """
-    An instruction class.
+    An abstract instruction class. Includes an abstract _check_valid
+    method to ensure created instructions are valid on initialisation.
 
     Attributes
     ----------
@@ -25,12 +28,17 @@ class Instruction():
     def __init__(self, line, inst):
         self.line = line
         self.inst = inst
+        self._check_valid()
 
     def get_line(self):
         return self.line
 
     def get_inst(self):
         return self.inst
+
+    @abstractmethod
+    def _check_valid(self):
+        pass
 
 class AInstruction(Instruction):
     """
@@ -62,11 +70,12 @@ class AInstruction(Instruction):
         Return the is_symbol attribute
     """
 
+    _valid_chars = frozenset(string.ascii_letters + string.digits + "_.$:")
+
     def __init__(self, line, inst, value):
-        super().__init__(line, inst)
         self.value = value
         self.numeric = value.isdigit()
-        self._check_value()
+        super().__init__(line, inst)
 
     def get_value(self):
         return self.value
@@ -74,7 +83,7 @@ class AInstruction(Instruction):
     def is_numeric(self):
         return self.numeric
 
-    def _check_value(self):
+    def _check_valid(self):
         """Check if an A-Instruction value is valid."""
         if self.value == "":
             raise NoAddressError(self)
@@ -88,7 +97,7 @@ class AInstruction(Instruction):
             raise BadVariableError(self)
         else:
             for c in self.value:
-                if c not in valid_chars:
+                if c not in AInstruction._valid_chars:
                     raise BadVariableError(self)
 
 class CInstruction(Instruction):
@@ -124,19 +133,45 @@ class CInstruction(Instruction):
     get_jump()
         Return the jump attribute
     """
+
+    dest = {None: "000", "M": "001", "D": "010", "MD": "011", "A": "100",
+             "AM": "101", "AD": "110", "AMD": "111"}
+
+    comp = {"0": "0101010", "1": "0111111", "-1": "0111010",
+             "D": "0001100", "A": "0110000", "M": "1110000",
+             "!D": "0001101", "!A": "0110001", "!M": "1110001",
+             "-D": "0001111", "-A": "0110011", "-M": "1110011",
+             "D+1": "0011111", "A+1": "0110111", "M+1": "1110111",
+             "D-1": "0001110", "A-1": "0110010", "M-1": "1110010",
+             "D+A": "0000010", "D+M": "1000010",
+             "D-A": "0010011", "D-M": "1010011",
+             "A-D": "0000111", "M-D": "1000111",
+             "D&A": "0000000", "D&M": "1000000",
+             "D|A": "0010101", "D|M": "1010101"}
+
+    jump = {None: "000", "JGT": "001", "JEQ": "010", "JGE": "011", "JLT": "100",
+             "JNE": "101", "JLE": "110", "JMP": "111"}
+
     def __init__(self, line, inst, dest, comp, jump):
+        self._dest = dest
+        self._comp = comp
+        self._jump = jump
         super().__init__(line, inst)
-        self.dest = dest
-        self.comp = comp
-        self.jump = jump
     
     def get_dest(self):
-        return self.dest
+        return self._dest
 
     def get_comp(self):
-        return self.comp
+        return self._comp
 
     def get_jump(self):
-        return self.jump
+        return self._jump
 
-valid_chars = frozenset(string.ascii_letters + string.digits + "_.$:")
+    def _check_valid(self):
+        if self._dest not in CInstruction.dest:
+            raise DestinationError(self)
+        if self._comp not in CInstruction.comp:
+            raise ComputationError(self)
+        if self._jump not in CInstruction.jump:
+            raise JumpError(self)
+
