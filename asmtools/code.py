@@ -9,7 +9,7 @@ class Encoder():
 
     Attributes
     ----------
-    table : SymbolTable
+    _table : SymbolTable
         Contains all the symbols used in the .asm file with their
         corresponding addresses
 
@@ -20,8 +20,8 @@ class Encoder():
     """
     
     def __init__(self, table):
-        self.table = table
-        self.ram_address = 16
+        self._table = table
+        self._ram_address = 16
 
     def encode(self, inst):
         """
@@ -57,14 +57,14 @@ class Encoder():
         value = self.inst.get_value()
         if self.inst.is_numeric():
             address = int(value)
-        elif self.table.contains(value):
-            address = self.table.get_address(value)
+        elif self._table.contains(value):
+            address = self._table.get_address(value)
         else:
-            if self.ram_address == 16383:
+            if self._ram_address == 16383:
                 raise RAMError(self.inst)
-            address = self.ram_address
-            self.table.add_entry(value, address)
-            self.ram_address += 1
+            address = self._ram_address
+            self._table.add_entry(value, address)
+            self._ram_address += 1
         bits = bin(address).replace("0b", "")
         return "0" * (16 - len(bits)) + bits
 

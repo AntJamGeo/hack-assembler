@@ -21,12 +21,12 @@ class SymbolTable():
     """
     
     def __init__(self):
-        self.table = {"SP": 0, "LCL": 1, "ARG": 2, "THIS": 3, "THAT": 4,
+        self._table = {"SP": 0, "LCL": 1, "ARG": 2, "THIS": 3, "THAT": 4,
                       "SCREEN": 16384, "KBD": 24576}
         for i in range(16):
-            self.table["R"+str(i)] = i
-        self.rom_address = 0
-        self.line = 0
+            self._table["R"+str(i)] = i
+        self._rom_address = 0
+        self._line = 0
 
     def add_label(self, inst):
         """
@@ -38,28 +38,28 @@ class SymbolTable():
             The instruction in which we want to find a label
         """
 
-        self.inst = strip_line(inst)
-        self.line += 1
-        if len(self.inst) < 1:
+        self._inst = strip_line(inst)
+        self._line += 1
+        if len(self._inst) < 1:
             return
 
-        if self.inst[0] == "(":
-            if self.inst[-1] != ")":
-                raise BracketError(self.line, self.inst)
-            label = self.inst[1:-1]
-            if label in self.table:
-                raise DuplicateLabelError(self.line, self.inst, label)
+        if self._inst[0] == "(":
+            if self._inst[-1] != ")":
+                raise BracketError(self._line, self._inst)
+            label = self._inst[1:-1]
+            if label in self._table:
+                raise DuplicateLabelError(self._line, self._inst, label)
             if len(label.split()) > 1:
-                raise BadLabelError(self.line, self.inst, label)
-            self.table[label] = self.rom_address
+                raise BadLabelError(self._line, self._inst, label)
+            self._table[label] = self._rom_address
         else:
-            self.rom_address += 1
+            self._rom_address += 1
 
     def add_entry(self, symbol, address):
-        self.table[symbol] = address
+        self._table[symbol] = address
 
     def contains(self, symbol):
-        return symbol in self.table
+        return symbol in self._table
 
     def get_address(self, symbol):
-        return self.table[symbol]
+        return self._table[symbol]

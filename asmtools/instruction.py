@@ -26,15 +26,15 @@ class Instruction(ABC):
         Return the inst attribute
     """
     def __init__(self, line, inst):
-        self.line = line
-        self.inst = inst
+        self._line = line
+        self._inst = inst
         self._check_valid()
 
     def get_line(self):
-        return self.line
+        return self._line
 
     def get_inst(self):
-        return self.inst
+        return self._inst
 
     @abstractmethod
     def _check_valid(self):
@@ -73,30 +73,30 @@ class AInstruction(Instruction):
     _valid_chars = frozenset(string.ascii_letters + string.digits + "_.$:")
 
     def __init__(self, line, inst, value):
-        self.value = value
-        self.numeric = value.isdigit()
+        self._value = value
+        self._numeric = value.isdigit()
         super().__init__(line, inst)
 
     def get_value(self):
-        return self.value
+        return self._value
 
     def is_numeric(self):
-        return self.numeric
+        return self._numeric
 
     def _check_valid(self):
         """Check if an A-Instruction value is valid."""
-        if self.value == "":
+        if self._value == "":
             raise NoAddressError(self)
-        if len(self.value.split()) > 1:
+        if len(self._value.split()) > 1:
             raise BadVariableError(self)
-        if self.numeric:
-            address = int(self.value)
+        if self._numeric:
+            address = int(self._value)
             if address < 0 or address > 32767:
                 raise AddressOutOfBoundsError(self)
-        elif self.value[0].isdigit():
+        elif self._value[0].isdigit():
             raise BadVariableError(self)
         else:
-            for c in self.value:
+            for c in self._value:
                 if c not in AInstruction._valid_chars:
                     raise BadVariableError(self)
 
