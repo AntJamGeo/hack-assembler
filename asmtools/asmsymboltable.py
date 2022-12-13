@@ -24,7 +24,7 @@ class SymbolTable():
         self.table = {"SP": 0, "LCL": 1, "ARG": 2, "THIS": 3, "THAT": 4,
                       "SCREEN": 16384, "KBD": 24576}
         for i in range(16):
-            self.table["R"+str(i)] = str(i)
+            self.table["R"+str(i)] = i
         self.rom_address = 0
         self.line = 0
 
