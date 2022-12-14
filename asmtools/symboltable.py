@@ -7,8 +7,6 @@ class SymbolTable():
 
     Methods
     -------
-    add_label(inst)
-        Look for an L-Instruction and adds any new label to the table
     add_entry(symbol, address)
         Add an unseen symbol to the table
     contains(symbol)
@@ -17,40 +15,41 @@ class SymbolTable():
         Get address corresponding to the given symbol
     """
     
-    def __init__(self):
+    def __init__(self, file_path=None):
+        """
+        Initialise a SymbolTable.
+
+        Parameters
+        ----------
+        file_path : str (optional)
+            If provided, all labels in the loaded .asm file are
+            added to the table.
+        """
         self._table = {"SP": 0, "LCL": 1, "ARG": 2, "THIS": 3, "THAT": 4,
                       "SCREEN": 16384, "KBD": 24576}
         for i in range(16):
             self._table["R"+str(i)] = i
-        self._rom_address = 0
-        self._line = 0
 
-    def add_label(self, inst):
-        """
-        Look for an L-Instruction and adds any new label to the table.
-
-        Parameters
-        ----------
-        inst : str
-            The instruction in which we want to find a label
-        """
-
-        self._inst = strip_line(inst)
-        self._line += 1
-        if len(self._inst) < 1:
-            return
-
-        if self._inst[0] == "(":
-            if self._inst[-1] != ")":
-                raise BracketError(self._line, self._inst)
-            label = self._inst[1:-1]
-            if label in self._table:
-                raise DuplicateLabelError(self._line, self._inst, label)
-            if len(label.split()) > 1:
-                raise BadLabelError(self._line, self._inst, label)
-            self._table[label] = self._rom_address
-        else:
-            self._rom_address += 1
+        if file_path:
+            rom_address = 0
+            with open(file_path, 'r') as in_file:
+                line_no = 0
+                for line in in_file:
+                    inst = strip_line(line)
+                    line_no += 1
+                    if not inst:
+                        continue
+                    if inst.startswith("("):
+                        if not inst.endswith(")"):
+                            raise BracketError(line_no, inst)
+                        label = inst[1:-1]
+                        if label in self._table:
+                            raise DuplicateLabelError(line_no, inst, label)
+                        if len(label.split()) > 1:
+                            raise BadLabelError(line_no, inst, label)
+                        self._table[label] = rom_address
+                    else:
+                        rom_address += 1
 
     def add_entry(self, symbol, address):
         """Add an unseen symbol to the table."""
