@@ -1,9 +1,10 @@
 import string
 from abc import ABC, abstractmethod
 
+from .symboltable import SymbolTable
 from .exceptions import (NoAddressError, BadVariableError,
         AddressOutOfBoundsError, DestinationError, ComputationError,
-        JumpError)
+        JumpError, RAMError)
 
 class Instruction(ABC):
     """
@@ -22,10 +23,14 @@ class Instruction(ABC):
         whitespace) as written in the provided file
     """
 
+    _symbol_table = SymbolTable()
+    _ram_address = 16
+
     def __init__(self, line, inst):
         self._line = line
         self._inst = inst
         self._check_valid()
+        self._encoded = self._encode()
 
     def get_line(self):
         return self._line
@@ -33,9 +38,21 @@ class Instruction(ABC):
     def get_inst(self):
         return self._inst
 
+    def encoded(self):
+        return self._encoded
+
     @abstractmethod
     def _check_valid(self):
         pass
+
+    @abstractmethod
+    def _encode(self):
+        pass
+
+    @classmethod
+    def load_table(cls, symbol_table):
+        cls._symbol_table = symbol_table
+
 
 class AInstruction(Instruction):
     """
@@ -86,6 +103,21 @@ class AInstruction(Instruction):
             for c in self._value:
                 if c not in AInstruction._VALID_CHARS:
                     raise BadVariableError(self)
+
+    def _encode(self):
+        if self._numeric:
+            address = int(self._value)
+        elif Instruction._symbol_table.contains(self._value):
+            address = Instruction._symbol_table.get_address(self._value)
+        else:
+            if Instruction._ram_address == 16383:
+                raise RAMError(self)
+            address = Instruction._ram_address
+            Instruction._symbol_table.add_entry(self._value, address)
+            Instruction._ram_address += 1
+        bits = bin(address).replace("0b", "")
+        return "0" * (16 - len(bits)) + bits
+
 
 class CInstruction(Instruction):
     """
@@ -149,3 +181,10 @@ class CInstruction(Instruction):
         if self._jump not in CInstruction.JUMP:
             raise JumpError(self)
 
+    def _encode(self):
+        return ("111" + CInstruction.COMP[self._comp] +
+                CInstruction.DEST[self._dest] + CInstruction.JUMP[self._jump])
+
+
+def prepare_symbol_table(file_path):
+    Instruction.load_table(SymbolTable(file_path))

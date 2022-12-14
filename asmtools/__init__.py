@@ -4,5 +4,4 @@ language to machine language.
 """
 
 from .parser import Parser
-from .code import Encoder
-from .symboltable import SymbolTable
+from .instruction import prepare_symbol_table

@@ -1,5 +1,5 @@
-from .exceptions import BracketError, DuplicateLabelError, BadLabelError
 from .funcs import strip_line
+from .exceptions import BracketError, DuplicateLabelError, BadLabelError
 
 class SymbolTable():
     """
