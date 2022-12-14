@@ -3,21 +3,18 @@ from .funcs import strip_line
 
 class SymbolTable():
     """
-    A store of all symbols in the .asm file.
-
-    Attributes
-    ----------
-    table : dict
-        Contains all symbols and their corresponding addresses
-    rom_address: int
-        Keeps track of which rom address should be assigned to the next label
-    line : int
-        Keeps track of which line in the file is being accessed
+    A store of all symbols in the .asm file and predefined symbols.
 
     Methods
     -------
     add_label(inst)
-        Looks for an L-Instruction and adds any new label to the table
+        Look for an L-Instruction and adds any new label to the table
+    add_entry(symbol, address)
+        Add an unseen symbol to the table
+    contains(symbol)
+        Check if a symbol is already in the table
+    get_address(symbol)
+        Get address corresponding to the given symbol
     """
     
     def __init__(self):
@@ -30,7 +27,7 @@ class SymbolTable():
 
     def add_label(self, inst):
         """
-        Looks for an L-Instruction and adds any new label to the table.
+        Look for an L-Instruction and adds any new label to the table.
 
         Parameters
         ----------
@@ -56,10 +53,13 @@ class SymbolTable():
             self._rom_address += 1
 
     def add_entry(self, symbol, address):
+        """Add an unseen symbol to the table."""
         self._table[symbol] = address
 
     def contains(self, symbol):
+        """Check if a symbol is already in the table."""
         return symbol in self._table
 
     def get_address(self, symbol):
+        """Get address corresponding to the given symbol."""
         return self._table[symbol]

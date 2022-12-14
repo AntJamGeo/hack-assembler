@@ -1,30 +1,27 @@
 import string
 from abc import ABC, abstractmethod
+
 from .exceptions import (NoAddressError, BadVariableError,
         AddressOutOfBoundsError, DestinationError, ComputationError,
         JumpError)
 
 class Instruction(ABC):
     """
-    An abstract instruction class. Includes an abstract _check_valid
-    method to ensure created instructions are valid on initialisation.
+    An abstract instruction class.
 
-    Attributes
-    ----------
-    line : int
-        The number in the file of the line from which the instruction
-        was obtained
-    inst : str
-        The full instruction (excluding comments and surrounding
-        whitespace) as written in the provided file
+    Includes an abstract _check_valid method to ensure created
+    instructions are valid on initialisation.
 
     Methods
     -------
     get_line()
-        Return the line attribute
+        Return number in the file of the line from which the instruction
+        was obtained
     get_inst()
-        Return the inst attribute
+        Return full instruction (excluding comments and surrounding
+        whitespace) as written in the provided file
     """
+
     def __init__(self, line, inst):
         self._line = line
         self._inst = inst
@@ -42,35 +39,26 @@ class Instruction(ABC):
 
 class AInstruction(Instruction):
     """
+    An A-Instruction class.
+
     Extends the Instruction class by also containing the value
     provided for the given A-Instruction.
-
-    Attributes
-    ----------
-    line : int
-        The number in the file of the line from which the instruction
-        was obtained
-    inst : str
-        The full instruction (excluding comments and surrounding
-        whitespace) as written in the provided file
-    value : str
-        The value after the '@' in the given A-Instruction
-    is_numeric : bool
-        True if the value attribute is numeric, false if symbolic
 
     Methods
     -------
     get_line()
-        Return the line attribute
+        Return number in the file of the line from which the instruction
+        was obtained
     get_inst()
-        Return the inst attribute
+        Return full instruction (excluding comments and surrounding
+        whitespace) as written in the provided file
     get_value()
-        Return the value attribute
+        Return value after the '@' in the given A-Instruction
     is_numeric()
-        Return the is_symbol attribute
+        Return true if the given address is numeric, false if symbolic
     """
 
-    _valid_chars = frozenset(string.ascii_letters + string.digits + "_.$:")
+    _VALID_CHARS = frozenset(string.ascii_letters + string.digits + "_.$:")
 
     def __init__(self, line, inst, value):
         self._value = value
@@ -84,7 +72,6 @@ class AInstruction(Instruction):
         return self._numeric
 
     def _check_valid(self):
-        """Check if an A-Instruction value is valid."""
         if self._value == "":
             raise NoAddressError(self)
         if len(self._value.split()) > 1:
@@ -97,47 +84,35 @@ class AInstruction(Instruction):
             raise BadVariableError(self)
         else:
             for c in self._value:
-                if c not in AInstruction._valid_chars:
+                if c not in AInstruction._VALID_CHARS:
                     raise BadVariableError(self)
 
 class CInstruction(Instruction):
     """
+    A C-Instruction class.
+
     Extends the Instruction class by also containing relevant
     C-Instruction information.
-
-    Attributes
-    ----------
-    line : int
-        The number in the file of the line from which the instruction
-        was obtained
-    inst : str
-        The full instruction (excluding comments and surrounding
-        whitespace) as written in the provided file
-    dest : str
-        Destination registers for the computation
-    comp : str
-        The desired computation
-    jump : str
-        The desired jump operation
 
     Methods
     -------
     get_line()
-        Return the line attribute
+        Return number in the file of the line from which the instruction
+        was obtained
     get_inst()
-        Return the inst attribute
+        Return full instruction (excluding comments and surrounding
+        whitespace) as written in the provided file
     get_dest()
-        Return the dest attribute
+        Return the destination registers for the computation
     get_comp()
-        Return the comp attribute
+        Return the desired computation
     get_jump()
-        Return the jump attribute
+        Return the jump operation
     """
 
-    dest = {None: "000", "M": "001", "D": "010", "MD": "011", "A": "100",
+    DEST = {None: "000", "M": "001", "D": "010", "MD": "011", "A": "100",
              "AM": "101", "AD": "110", "AMD": "111"}
-
-    comp = {"0": "0101010", "1": "0111111", "-1": "0111010",
+    COMP = {"0": "0101010", "1": "0111111", "-1": "0111010",
              "D": "0001100", "A": "0110000", "M": "1110000",
              "!D": "0001101", "!A": "0110001", "!M": "1110001",
              "-D": "0001111", "-A": "0110011", "-M": "1110011",
@@ -148,8 +123,7 @@ class CInstruction(Instruction):
              "A-D": "0000111", "M-D": "1000111",
              "D&A": "0000000", "D&M": "1000000",
              "D|A": "0010101", "D|M": "1010101"}
-
-    jump = {None: "000", "JGT": "001", "JEQ": "010", "JGE": "011", "JLT": "100",
+    JUMP = {None: "000", "JGT": "001", "JEQ": "010", "JGE": "011", "JLT": "100",
              "JNE": "101", "JLE": "110", "JMP": "111"}
 
     def __init__(self, line, inst, dest, comp, jump):
@@ -168,10 +142,10 @@ class CInstruction(Instruction):
         return self._jump
 
     def _check_valid(self):
-        if self._dest not in CInstruction.dest:
+        if self._dest not in CInstruction.DEST:
             raise DestinationError(self)
-        if self._comp not in CInstruction.comp:
+        if self._comp not in CInstruction.COMP:
             raise ComputationError(self)
-        if self._jump not in CInstruction.jump:
+        if self._jump not in CInstruction.JUMP:
             raise JumpError(self)
 

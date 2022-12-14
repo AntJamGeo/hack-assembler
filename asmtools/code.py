@@ -1,31 +1,32 @@
 from .instruction import AInstruction, CInstruction
 from .exceptions import RAMError
 
+
 class Encoder():
     """
-    Uses information from an assembly language instruction that has been
-    parsed using a Parser instance to produce the corresponding machine
-    language instruction.
-
-    Attributes
-    ----------
-    _table : SymbolTable
-        Contains all the symbols used in the .asm file with their
-        corresponding addresses
+    Encode an assembly language instruction in machine language.
 
     Methods
     -------
     encode(inst)
-        Converts parsed instruction into machine language
+        Convert parsed instruction into machine language
     """
     
     def __init__(self, table):
+        """
+        Inits Encoder class.
+
+        Parameters
+        ----------
+        table : SymbolTable
+            Symbol table containing all symbols with their addresses
+        """
         self._table = table
         self._ram_address = 16
 
     def encode(self, inst):
         """
-        Converts parsed instruction into machine language.
+        Convert parsed instruction into machine language.
 
         Parameters
         ----------
@@ -36,15 +37,6 @@ class Encoder():
         -------
         str
             Instruction in machine language
-
-        Raises
-        ------
-        DestinationError
-            The destination provided in a C-Instruction is invalid
-        ComputationError
-            The computation provided in a C-Instruction is invalid
-        JumpError
-            The jump provided in a C-Instruction is invalid
         """
 
         self.inst = inst
@@ -72,6 +64,6 @@ class Encoder():
         dest = self.inst.get_dest()
         comp = self.inst.get_comp()
         jump = self.inst.get_jump()
-        return ("111" + CInstruction.comp[comp] + CInstruction.dest[dest] +
-                CInstruction.jump[jump])
+        return ("111" + CInstruction.COMP[comp] + CInstruction.DEST[dest] +
+                CInstruction.JUMP[jump])
 

@@ -4,22 +4,16 @@ from .exceptions import InstructionError
 
 class Parser():
     """
+    A assembly language parser.
+
     Loads an instruction using the parse function to determine the
     important information in a line of assembly code, which can then be
     passed on to the Encoder class for encoding into machine language.
 
-    Attributes
-    ----------
-    _line : int
-        count of lines processed
-    _inst : str
-        current instruction being processed
-
     Methods
     -------
     parse(inst)
-        Determine which type of instruction is being given and return
-        information in a suitable format to be read by an Encoder instance
+        Parse an assembly language string.
     """
 
     def __init__(self):
@@ -27,7 +21,9 @@ class Parser():
 
     def parse(self, inst):
         """
-        Determine which type of instruction is being given and return
+        Parse an assembly language string.
+
+        Determines which type of instruction is being given and returns
         information in a suitable format to be read by an Encoder instance.
 
         Parameters
