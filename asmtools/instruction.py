@@ -2,9 +2,10 @@ import string
 from abc import ABC, abstractmethod
 
 from .symboltable import SymbolTable
-from .exceptions import (NoAddressError, BadVariableError,
-        AddressOutOfBoundsError, DestinationError, ComputationError,
-        JumpError, RAMError)
+from .exceptions import (
+        NoAddressError, BadVariableError, AddressOutOfBoundsError,
+        DestinationError, ComputationError, JumpError, RAMError)
+
 
 class Instruction(ABC):
     """
@@ -21,6 +22,8 @@ class Instruction(ABC):
     get_inst()
         Return full instruction (excluding comments and surrounding
         whitespace) as written in the provided file
+    encoded()
+        Return the instruction in machine language
     """
 
     _symbol_table = SymbolTable()
@@ -73,6 +76,8 @@ class AInstruction(Instruction):
         Return value after the '@' in the given A-Instruction
     is_numeric()
         Return true if the given address is numeric, false if symbolic
+    encoded()
+        Return the instruction in machine language
     """
 
     _VALID_CHARS = frozenset(string.ascii_letters + string.digits + "_.$:")
@@ -140,6 +145,8 @@ class CInstruction(Instruction):
         Return the desired computation
     get_jump()
         Return the jump operation
+    encoded()
+        Return the instruction in machine language
     """
 
     DEST = {None: "000", "M": "001", "D": "010", "MD": "011", "A": "100",

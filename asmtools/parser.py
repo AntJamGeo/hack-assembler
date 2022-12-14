@@ -32,18 +32,13 @@ class Parser():
 
         Returns
         -------
-        Instruction
-            Useful information to be encoded by an Encoder instance
-
-        Raises
-        ------
-        InstructionError
-            An invalid instruction has been passed and cannot be parsed
+        Instruction|False
+            Useful information to be encoded by an Encoder instance. If
+            whitespace of L-Instruction given, returns False.
         """
-
         self._inst = strip_line(inst)
         self._line += 1
-        if not self._inst or self._inst.startswith("("): # ignore whitespace
+        if not self._inst or self._inst.startswith("("):
             return False
         elif self._inst.startswith("@"): # A-Instruction
             return self._a_inst()
