@@ -1,6 +1,5 @@
 from .instruction import AInstruction, CInstruction
 from .funcs import strip_line
-from .exceptions import InstructionError
 
 class Parser():
     """
@@ -44,24 +43,16 @@ class Parser():
 
         self._inst = strip_line(inst)
         self._line += 1
-        if len(self._inst) < 1: # ignore whitespace
+        if not self._inst or self._inst.startswith("("): # ignore whitespace
             return False
-        elif self._inst[0] == "@": # A-Instruction
+        elif self._inst.startswith("@"): # A-Instruction
             return self._a_inst()
-        elif self._inst[0] == "(": # L-Instruction
-            return False
-        elif self._inst[0] in {"A", "D", "M", "0", "1", "-", "!"}: # C-Instruction
+        else: # C-Instruction
             return self._c_inst()
-        raise InstructionError(self._line, self._inst)
-
 
     def _a_inst(self):
         """Parse A-Instructions."""
         return AInstruction(self._line, self._inst, self._inst[1:])
-
-    def _l_inst(self):
-        """Parse L-Instructions."""
-        return ""
 
     def _c_inst(self):
         """Parse C-Instructions."""
