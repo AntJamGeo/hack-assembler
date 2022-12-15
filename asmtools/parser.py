@@ -6,8 +6,7 @@ class Parser():
     A assembly language parser.
 
     Loads an instruction using the parse function to determine the
-    important information in a line of assembly code, which can then be
-    passed on to the Encoder class for encoding into machine language.
+    important information in a line of assembly code.
 
     Methods
     -------
@@ -22,9 +21,6 @@ class Parser():
         """
         Parse an assembly language string.
 
-        Determines which type of instruction is being given and returns
-        information in a suitable format to be read by an Encoder instance.
-
         Parameters
         ----------
         inst : str
@@ -33,8 +29,8 @@ class Parser():
         Returns
         -------
         Instruction|False
-            Useful information to be encoded by an Encoder instance. If
-            whitespace of L-Instruction given, returns False.
+            The instruction with its important information separated. If
+            whitespace or L-Instruction given, returns False.
         """
         self._inst = strip_line(inst)
         self._line += 1
