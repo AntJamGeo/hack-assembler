@@ -1,0 +1,6 @@
+*.swp
+*.asm
+*.hack
+*temp*
+*pycache*
+tests 
