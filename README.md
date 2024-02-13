@@ -9,6 +9,10 @@ The assembler requires a .asm file to be provided to it in order to run, and a .
 To use, clone this repository and run `python3 <path to assembler.py> <path to target .asm file>`. For example, if the current working directory is the hack-assembler directory and we add
 * `example.asm` to the directory, running `python3 assembler.py example.asm` will produce `example.hack` in the hack-assembler directory.
 
+## Related Projects
+* Hack Virtual Machine Translator: https://github.com/AntJamGeo/hack-vm-translator
+* Jack Compiler: https://github.com/AntJamGeo/jack-compiler
+
 ## References
 * nand2tetris Website: https://www.nand2tetris.org/
 * Part 1 of the Course (Hardware): https://www.coursera.org/learn/build-a-computer
